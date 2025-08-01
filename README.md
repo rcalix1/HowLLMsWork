@@ -6,7 +6,50 @@
 ## Link
 
 * https://github.com/rcalix1/DeepLearningAlgorithms/tree/main/SecondEdition/Chapter10_Transformers/GPTs
-* 
+
+## Dot Product
+
+# README.md
+
+# 🔢 Dot Product Example with PyTorch
+
+This is a minimal example that demonstrates how to compute the **dot product** of two vectors using PyTorch.
+
+
+## 🧪 Example Code
+
+```python
+import torch
+
+# Define two 1D tensors (vectors)
+a = torch.tensor([1.0, 2.0, 3.0])
+b = torch.tensor([4.0, 5.0, 6.0])
+
+# Compute dot product using torch.dot
+dot_product = torch.dot(a, b)
+
+print(f"Dot product: {dot_product.item()}")
+```
+
+## ✅ Output
+
+```
+Dot product: 32.0
+```
+
+## 📘 Explanation
+
+The dot product of two vectors is calculated as:
+
+```
+1×4 + 2×5 + 3×6 = 4 + 10 + 18 = 32
+```
+
+## 🧠 Notes
+
+- `torch.dot` requires both inputs to be 1D tensors of the same length.
+- For matrix-style multiplication, use `torch.matmul` instead.
+
 
 ## Matrix Multiplication
 
