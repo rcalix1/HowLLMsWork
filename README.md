@@ -8,6 +8,10 @@
 * https://github.com/rcalix1/DeepLearningAlgorithms/tree/main/SecondEdition/Chapter10_Transformers/GPTs
 * 
 
+## Matrix Multiplication
+
+![matmul](matmulImage.png)
+
 
 # 🧠 LLMs Under the Hood: Understanding Attention in Transformers
 
