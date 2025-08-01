@@ -9,11 +9,6 @@
 * 
 
 
-Understood — thank you for your patience. Here's a **fully and properly formatted `README.md`** using standard GitHub Markdown. It clearly separates **code blocks** from **explanatory text**, with proper headings, syntax highlighting, and layout for readability.
-
----
-
-````markdown
 # 🧠 LLMs Under the Hood: Understanding Attention in Transformers
 
 This repository walks through the **Attention Mechanism** at the core of Transformer models like GPT, BERT, and LLaMA — implemented from scratch in PyTorch.
@@ -34,7 +29,7 @@ We simulate a batch of 32 sequences, each 40 tokens long, with an embedding size
 
 ```python
 x = torch.randn(32, 40, 512)
-````
+```
 
 ---
 
@@ -122,7 +117,7 @@ z = out_cat @ w0 + b0  # shape: (32, 40, 512)
 
 ---
 
-## 🧪 How to Run
+## 💪 How to Run
 
 Install PyTorch:
 
@@ -149,11 +144,3 @@ python attention_demo.py
 ## 🎓 About
 
 This material is part of the **"LLMs Under the Hood"** masterclass — a 90-minute session designed for engineers and data scientists who want to deeply understand how Transformers work.
-
-```
-
----
-
-✅ You can now paste this directly into a `README.md` file, and it will render perfectly on GitHub, VSCode, or any Markdown viewer. Let me know if you'd like a PDF version or additional visual diagrams!
-```
-
