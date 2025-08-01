@@ -357,6 +357,8 @@ Each token in each sequence now has a predicted distribution over the vocabulary
 ---
 
 
-## 🎓 About
+🎓 About
 
-This material is part of the **"LLMs Under the Hood"** masterclass — a 90-minute session designed for engineers and data scientists who want to deeply understand how Transformers work.
+This material is part of the "LLMs Under the Hood" masterclass by Ricardo Calix — a 90-minute session designed for engineers and data scientists who want to deeply understand how Transformers work.
+
+Visit: www.rcalix.com
