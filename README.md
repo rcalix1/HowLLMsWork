@@ -136,8 +136,7 @@ python attention_demo.py
 ## 📚 Recommended Reading
 
 * [Attention is All You Need (Vaswani et al., 2017)](https://arxiv.org/abs/1706.03762)
-* [The Illustrated Transformer](https://jalammar.github.io/illustrated-transformer/)
-* [Karpathy's nanoGPT](https://github.com/karpathy/nanoGPT)
+
 
 ---
 
