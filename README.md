@@ -228,6 +228,135 @@ python attention_demo.py
 
 ---
 
+# 🧠 Baby Transformer (GPT-style) from Scratch
+
+This project implements a **super simple GPT-style Transformer block** in PyTorch. It includes token embeddings, learned positional embeddings, single-head self-attention, a feedforward layer, and a final projection back to the vocabulary.
+
+---
+
+## 📌 Objective
+
+Build and run a **minimal decoder-only Transformer block** for demonstration and educational purposes:
+
+* Input: token IDs
+* Output: logits over vocabulary
+* From-scratch attention and projection
+* No `nn.Transformer`, no magic
+
+---
+
+## 💾 Code Overview
+
+```python
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+
+# === Config ===
+batch_size = 2
+seq_len = 10
+vocab_size = 1000
+embed_dim = 64
+ff_dim = 128
+
+# === Input tokens ===
+tokens = torch.randint(0, vocab_size, (batch_size, seq_len))  # [2, 10]
+
+# === Embedding layers ===
+token_embed = nn.Embedding(vocab_size, embed_dim)
+pos_embed = nn.Embedding(seq_len, embed_dim)
+
+x_token = token_embed(tokens)  # [2, 10, 64]
+positions = torch.arange(seq_len).unsqueeze(0).expand(batch_size, seq_len)
+x_pos = pos_embed(positions)  # [2, 10, 64]
+
+x = x_token + x_pos  # [2, 10, 64]
+
+# === Self-Attention ===
+Wq = nn.Linear(embed_dim, embed_dim)
+Wk = nn.Linear(embed_dim, embed_dim)
+Wv = nn.Linear(embed_dim, embed_dim)
+
+Q = Wq(x)  # [2, 10, 64]
+K = Wk(x)
+V = Wv(x)
+
+attn_scores = Q @ K.transpose(-2, -1) / (embed_dim ** 0.5)  # [2, 10, 10]
+attn_weights = F.softmax(attn_scores, dim=-1)              # [2, 10, 10]
+attn_output = attn_weights @ V                             # [2, 10, 64]
+
+# === Feedforward ===
+ff1 = nn.Linear(embed_dim, ff_dim)
+ff2 = nn.Linear(ff_dim, embed_dim)
+
+ff_output = ff2(F.relu(ff1(attn_output)))  # [2, 10, 64]
+
+# === Final projection to vocab ===
+to_vocab = nn.Linear(embed_dim, vocab_size)
+logits = to_vocab(ff_output)  # [2, 10, 1000]
+
+print("Logits shape:", logits.shape)
+```
+
+---
+
+## 👀 What This Does
+
+| Step                  | Description                                         |
+| --------------------- | --------------------------------------------------- |
+| Token + Pos Embedding | Converts token IDs to dense vectors + adds position |
+| Q, K, V               | Learnable linear projections                        |
+| Attention Weights     | Scaled dot product + softmax                        |
+| Weighted Sum          | Multiplies V by attention weights                   |
+| Feedforward Layer     | Hidden → output transformation                      |
+| Final Projection      | Projects to logits over vocab                       |
+
+---
+
+## 🧮 Why This Matters
+
+This baby Transformer captures the **core ideas** of decoder-only models like GPT:
+
+* Contextual token representation
+* Self-attention alignment
+* Feedforward transformation
+* Vocabulary prediction head
+
+Perfect for learning and experimenting.
+
+---
+
+## 🚀 Run It
+
+To execute this code:
+
+```bash
+pip install torch
+python baby_transformer.py
+```
+
+---
+
+## ✅ Output
+
+```python
+Logits shape: torch.Size([2, 10, 1000])
+```
+
+Each token in each sequence now has a predicted distribution over the vocabulary.
+
+---
+
+## 📖 Next Steps
+
+* Wrap it in an `nn.Module`
+* Add residuals and layer norm
+* Train on a toy dataset
+* Extend to multi-head attention and multiple layers
+
+---
+
+
 ## 🎓 About
 
 This material is part of the **"LLMs Under the Hood"** masterclass — a 90-minute session designed for engineers and data scientists who want to deeply understand how Transformers work.
