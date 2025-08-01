@@ -12,6 +12,90 @@
 
 ![matmul](matmulImage.png)
 
+# 🧼 Matrix Multiplication Example in PyTorch
+
+This minimal example demonstrates how **matrix multiplication** works in PyTorch using `torch.matmul`, a foundational operation in deep learning and linear algebra.
+
+---
+
+## 📌 Objective
+
+Multiply a matrix `x` of shape `[150, 4]` with a weight matrix `w` of shape `[4, 6]` to produce an output matrix `y` of shape `[150, 6]`.
+
+This operation is commonly used in:
+
+* Linear layers (`y = x @ W`)
+* Feature transformations
+* Neural network forward passes
+
+---
+
+## 💾 Code Overview
+
+```python
+import torch
+
+# Input matrix: 150 samples with 4 features each
+x = torch.randn(150, 4)
+
+# Weight matrix: transforms 4D features into 6D
+w = torch.randn(4, 6)
+
+# Matrix multiplication: outputs shape [150, 6]
+y = torch.matmul(x, w)
+```
+
+---
+
+## 📀 Shapes Summary
+
+| Variable | Shape     | Description                       |
+| -------- | --------- | --------------------------------- |
+| `x`      | \[150, 4] | 150 samples, each with 4 features |
+| `w`      | \[4, 6]   | Transformation matrix             |
+| `y`      | \[150, 6] | Output: 150 samples, now 6D       |
+
+---
+
+## 🧠 Why This Matters
+
+This is the core of how neural networks compute outputs:
+A layer transforms input features into a new representation by **multiplying by a learned weight matrix**.
+
+This example is the essence of:
+
+```python
+y = x @ W + b
+```
+
+used in every `nn.Linear` layer.
+
+---
+
+## 🚀 Run It
+
+To execute this code:
+
+```bash
+pip install torch
+python your_script.py
+```
+
+Or run it inside a Jupyter notebook cell.
+
+---
+
+## ✅ Output
+
+```python
+print(y.shape)
+# Output: torch.Size([150, 6])
+```
+
+This confirms that 150 input vectors were each projected into 6-dimensional space.
+
+---
+
 
 # 🧠 LLMs Under the Hood: Understanding Attention in Transformers
 
