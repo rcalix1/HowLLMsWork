@@ -2,7 +2,7 @@
 
 * AGS
 * How LLMs work under the hood
-* 
+
 
 ## Link
 
