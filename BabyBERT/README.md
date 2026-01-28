@@ -167,6 +167,178 @@ print(logits.shape)  # torch.Size([batch_size, 2])
 
 ---
 
+# 🧠 Baby BERT from Scratch (with Inference Examples)
+
+This project demonstrates a **minimal BERT-style Transformer** built from scratch in PyTorch — ideal for understanding the **encoder-based** architecture that powers models like BERT.
+
+---
+
+## 📌 Objective
+
+Build and run a **minimal encoder-only Transformer block** for demonstration and educational purposes:
+
+* Input: token IDs
+* Output: contextual embeddings, NSP score, or masked token prediction
+* Includes: token & position embeddings, self-attention, feedforward, and layer normalization
+* Supports BERT's two pretraining tasks:
+  - Masked Language Modeling (MLM)
+  - Next Sentence Prediction (NSP)
+
+---
+
+## 🧾 BERT vs GPT: Core Difference
+
+| Feature         | GPT                        | BERT                      |
+|----------------|-----------------------------|---------------------------|
+| Architecture    | Decoder-only                | Encoder-only              |
+| Attention Mask | Causal (left to right)      | Bidirectional (full)      |
+| Use Case       | Generation                  | Classification, QA, etc.  |
+
+---
+
+## ✅ Baby BERT Sentence Pair Scorer (NSP-style)
+
+This shows how to encode two segments and output a binary score: *does sentence B follow A?*
+
+```python
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+
+# === Settings ===
+vocab_size = 1000
+embed_dim = 64
+ff_dim = 128
+seq_len = 12  # including [CLS], [SEP], [SEP]
+batch_size = 1
+
+# === Example ===
+# [CLS] the cat sat on [SEP] it was soft [SEP]
+input_ids = torch.tensor([[0, 10, 20, 30, 40, 1, 50, 60, 70, 1, 0, 0]])
+segment_ids = torch.tensor([[0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0]])
+
+# === Embedding Layers ===
+token_embed = nn.Embedding(vocab_size, embed_dim)
+pos_embed = nn.Embedding(seq_len, embed_dim)
+seg_embed = nn.Embedding(2, embed_dim)
+
+positions = torch.arange(seq_len).unsqueeze(0)
+x = token_embed(input_ids) + pos_embed(positions) + seg_embed(segment_ids)
+
+# === Baby BERT Block ===
+class BabyBertBlock(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.norm1 = nn.LayerNorm(embed_dim)
+        self.q = nn.Linear(embed_dim, embed_dim)
+        self.k = nn.Linear(embed_dim, embed_dim)
+        self.v = nn.Linear(embed_dim, embed_dim)
+        self.norm2 = nn.LayerNorm(embed_dim)
+        self.ff1 = nn.Linear(embed_dim, ff_dim)
+        self.ff2 = nn.Linear(ff_dim, embed_dim)
+
+    def forward(self, x):
+        h = self.norm1(x)
+        attn = F.softmax(self.q(h) @ self.k(h).transpose(-2, -1) / (embed_dim ** 0.5), dim=-1)
+        x = x + attn @ self.v(h)
+        h = self.norm2(x)
+        x = x + self.ff2(F.relu(self.ff1(h)))
+        return x
+
+encoder = BabyBertBlock()
+x = encoder(x)
+
+# === NSP Head ===
+cls_embedding = x[:, 0, :]  # [CLS] token
+score_head = nn.Linear(embed_dim, 1)
+score = torch.sigmoid(score_head(cls_embedding))
+
+print("NSP score (0-1):", score.item())
+```
+
+---
+
+## ✅ Baby BERT Masked Token Predictor (MLM-style)
+
+This example shows how to **predict a missing word** like:
+
+```
+"The cat sat on the [MASK]."
+```
+
+```python
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+
+# === Settings ===
+vocab_size = 1000
+embed_dim = 64
+ff_dim = 128
+seq_len = 6
+batch_size = 1
+MASK_ID = 103
+
+# === Input ===
+# "the cat sat on [MASK] ."
+input_ids = torch.tensor([[10, 20, 30, 40, MASK_ID, 50]])
+
+# === Embedding Layers ===
+token_embed = nn.Embedding(vocab_size, embed_dim)
+pos_embed = nn.Embedding(seq_len, embed_dim)
+positions = torch.arange(seq_len).unsqueeze(0)
+x = token_embed(input_ids) + pos_embed(positions)
+
+# === Baby BERT Encoder ===
+class BabyBertBlock(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.norm1 = nn.LayerNorm(embed_dim)
+        self.q = nn.Linear(embed_dim, embed_dim)
+        self.k = nn.Linear(embed_dim, embed_dim)
+        self.v = nn.Linear(embed_dim, embed_dim)
+        self.norm2 = nn.LayerNorm(embed_dim)
+        self.ff1 = nn.Linear(embed_dim, ff_dim)
+        self.ff2 = nn.Linear(ff_dim, embed_dim)
+
+    def forward(self, x):
+        h = self.norm1(x)
+        attn = F.softmax(self.q(h) @ self.k(h).transpose(-2, -1) / (embed_dim ** 0.5), dim=-1)
+        x = x + attn @ self.v(h)
+        h = self.norm2(x)
+        x = x + self.ff2(F.relu(self.ff1(h)))
+        return x
+
+encoder = BabyBertBlock()
+x = encoder(x)
+
+# === Output Projection to Vocab ===
+proj = nn.Linear(embed_dim, vocab_size)
+logits = proj(x)  # [1, 6, vocab_size]
+
+# === Get prediction at MASK position
+mask_pos = (input_ids == MASK_ID).nonzero(as_tuple=True)
+predicted_id = torch.argmax(logits[mask_pos], dim=-1).item()
+
+print("Predicted token ID at [MASK]:", predicted_id)
+```
+
+---
+
+## 🧠 Summary
+
+| Function        | Description                             |
+|----------------|-----------------------------------------|
+| NSP scorer      | Outputs a binary score for A→B         |
+| Mask predictor  | Predicts a token for `[MASK]` position |
+
+---
+
+🎓 Part of the "LLMs Under the Hood" masterclass by Ricardo Calix — focused on building Transformers from scratch.
+
+
+---
+
 🎓 About
 
 This material is part of the "LLMs Under the Hood" masterclass by Ricardo Calix — a 90-minute session designed for engineers and data scientists who want to deeply understand how Transformers work — both decoder (GPT) and encoder (BERT) styles.
