@@ -397,6 +397,93 @@ Each token in each sequence now has a predicted distribution over the vocabulary
 
 ---
 
+# GPT Cross Entropy and One-Hot Encoding
+
+For GPT training, the model produces a set of logits for every token position.
+
+For example, with a vocabulary of 65 characters:
+
+```python
+logits.shape = [B, T, 65]
+targets.shape = [B, T]
+```
+
+Each target is simply the ID of the correct next character:
+
+```text
+target = 17
+```
+
+Mathematically, we can think of this target as a **one-hot encoded vector**:
+
+```text
+[0, 0, 0, ..., 1, ..., 0]
+                ^
+              ID 17
+```
+
+The model produces 65 logits. Softmax converts these logits into probabilities:
+
+\[
+p_i = \frac{e^{z_i}}{\sum_j e^{z_j}}
+\]
+
+Cross entropy compares this probability distribution with the one-hot target:
+
+\[
+L = -\sum_i y_i \log(p_i)
+\]
+
+Because the target is one-hot, only the correct class remains:
+
+\[
+L = -\log(p_{17})
+\]
+
+In PyTorch:
+
+```python
+loss = F.cross_entropy(logits, targets)
+```
+
+we **do not need to explicitly create the one-hot vector**. PyTorch accepts the correct class ID directly and efficiently performs the equivalent calculation.
+
+## Why Flatten B and T?
+
+Before calculating the loss:
+
+```python
+logits  = logits.view(B*T, vocab_size)
+targets = targets.view(B*T)
+```
+
+For example:
+
+```text
+logits:  [64, 40, 65] → [2560, 65]
+targets: [64, 40]     → [2560]
+```
+
+Every token position is treated as a separate classification problem:
+
+```text
+65 logits → one correct token ID
+65 logits → one correct token ID
+65 logits → one correct token ID
+...
+```
+
+So the easiest way to remember it is:
+
+**GPT training = one next-token classification problem at every token position.**
+
+**Mathematically:** logits → softmax → compare with one-hot target → cross entropy.
+
+**In PyTorch:** just provide the logits and the correct integer token IDs. PyTorch handles the efficient equivalent internally.
+
+
+---
+
 
 🎓 About
 
