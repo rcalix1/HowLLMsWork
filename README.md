@@ -424,21 +424,21 @@ Mathematically, we can think of this target as a **one-hot encoded vector**:
 
 The model produces 65 logits. Softmax converts these logits into probabilities:
 
-\[
+$$
 p_i = \frac{e^{z_i}}{\sum_j e^{z_j}}
-\]
+$$
 
 Cross entropy compares this probability distribution with the one-hot target:
 
-\[
+$$
 L = -\sum_i y_i \log(p_i)
-\]
+$$
 
 Because the target is one-hot, only the correct class remains:
 
-\[
+$$
 L = -\log(p_{17})
-\]
+$$
 
 In PyTorch:
 
