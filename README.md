@@ -485,6 +485,110 @@ So the easiest way to remember it is:
 ---
 
 
+# GPT Embeddings and Context
+
+Suppose:
+
+```text
+vocab_size = 50,000
+n_embd = 512
+```
+
+The embedding layer:
+
+```python
+nn.Embedding(50000, 512)
+```
+
+is basically a learned lookup table:
+
+```text
+[50000, 512]
+```
+
+If `"bank"` has token ID `354`, then:
+
+```python
+embedding[354]
+```
+
+always returns the **same 512 numbers**.
+
+Therefore:
+
+```text
+"river bank"  → bank starts with the same 512 values
+"money bank"  → bank starts with the same 512 values
+```
+
+The embedding layer itself does **not** understand the context.
+
+## Attention Adds the Context
+
+For a batch of sequences:
+
+```text
+[B, T] → Embedding → [B, T, 512]
+```
+
+This enters the transformer blocks:
+
+```text
+[B, T, 512]
+      ↓
+   Attention
+      ↓
+[B, T, 512]
+```
+
+The dimensions stay exactly the same, but the **values change**.
+
+After attention:
+
+```text
+"river bank" → bank's 512 values now contain information
+               from words such as river, water, shore, etc.
+
+"money bank" → bank's 512 values now contain information
+               from words such as money, account, deposit, etc.
+```
+
+So:
+
+```text
+BEFORE ATTENTION
+
+bank → same 512 values
+
+
+AFTER ATTENTION
+
+river bank → contextualized 512 values
+
+money bank → different contextualized 512 values
+```
+
+Each transformer block continues modifying these representations.
+
+## The Key Idea
+
+**Embedding layer = static token representation**
+
+**Transformer/attention = contextualized token representation**
+
+The shape can remain:
+
+```text
+[B, T, 512]
+```
+
+throughout the transformer.
+
+The **size does not need to change for the meaning represented by those numbers to change.**
+
+---
+
+
 🎓 About
 
 This material is part of the "LLMs Under the Hood" masterclass by Ricardo Calix — a 90-minute session designed for engineers and data scientists who want to deeply understand how Transformers work.
