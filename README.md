@@ -586,6 +586,89 @@ throughout the transformer.
 
 The **size does not need to change for the meaning represented by those numbers to change.**
 
+
+```
+
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+
+torch.manual_seed(1)
+
+# === Tiny Vocabulary ===
+words = {
+    "river": 0,
+    "bank":  1,
+    "money": 2
+}
+
+vocab_size = 3
+embed_dim = 4
+
+# Two sentences:
+# "river bank"
+# "money bank"
+tokens = torch.tensor([
+    [words["river"], words["bank"]],
+    [words["money"], words["bank"]]
+])
+
+# === Embedding ===
+token_embed = nn.Embedding(vocab_size, embed_dim)
+
+x = token_embed(tokens)   # [2, 2, 4]
+
+print("BANK BEFORE ATTENTION")
+print(x[0, 1])   # bank in "river bank"
+print(x[1, 1])   # bank in "money bank"
+
+
+# === Self-Attention ===
+Wq = nn.Linear(embed_dim, embed_dim)
+Wk = nn.Linear(embed_dim, embed_dim)
+Wv = nn.Linear(embed_dim, embed_dim)
+
+Q = Wq(x)
+K = Wk(x)
+V = Wv(x)
+
+scores = Q @ K.transpose(-2, -1) / (embed_dim ** 0.5)
+weights = F.softmax(scores, dim=-1)
+
+attn_output = weights @ V
+
+
+print("\nBANK AFTER ATTENTION")
+print(attn_output[0, 1])   # bank in "river bank"
+print(attn_output[1, 1])   # bank in "money bank"
+
+
+```
+
+and the result
+
+
+```
+
+BANK BEFORE ATTENTION
+tensor([-0.4519, -0.1661, -1.5228,  0.3817], grad_fn=<SelectBackward0>)
+tensor([-0.4519, -0.1661, -1.5228,  0.3817], grad_fn=<SelectBackward0>)
+
+BANK AFTER ATTENTION
+tensor([-0.3758, -0.7096,  0.0495,  0.3746], grad_fn=<SelectBackward0>)
+tensor([-0.0939, -0.3265, -0.3391,  0.3022], grad_fn=<SelectBackward0>)
+
+
+```
+
+
+
+
+
+
+
+
+
 ---
 
 
